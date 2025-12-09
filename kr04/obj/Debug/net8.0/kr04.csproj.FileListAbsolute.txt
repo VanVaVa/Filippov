@@ -1,0 +1,15 @@
+/home/dude/Sharaga/dotnet/Filippov/kr04/bin/Debug/net8.0/kr04
+/home/dude/Sharaga/dotnet/Filippov/kr04/bin/Debug/net8.0/kr04.deps.json
+/home/dude/Sharaga/dotnet/Filippov/kr04/bin/Debug/net8.0/kr04.runtimeconfig.json
+/home/dude/Sharaga/dotnet/Filippov/kr04/bin/Debug/net8.0/kr04.dll
+/home/dude/Sharaga/dotnet/Filippov/kr04/bin/Debug/net8.0/kr04.pdb
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.GeneratedMSBuildEditorConfig.editorconfig
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.AssemblyInfoInputs.cache
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.AssemblyInfo.cs
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.csproj.CoreCompileInputs.cache
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.sourcelink.json
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.dll
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/refint/kr04.dll
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.pdb
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/kr04.genruntimeconfig.cache
+/home/dude/Sharaga/dotnet/Filippov/kr04/obj/Debug/net8.0/ref/kr04.dll
