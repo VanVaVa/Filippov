@@ -1,174 +1,86 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 
-public class SimpleList<T> : IList<T>, IList, IEnumerable<T>, IEnumerable, ICollection<T>, ICollection
+namespace lab03.Collections;
+
+public class SimpleList<T> : IList<T>, ICollection<T>, IEnumerable<T>
 {
-    private T[] _items;
-    private int _size;
-    private int _version;
-    private static readonly T[] _emptyArray = new T[0];
+    private T[] elements;
+    private int size;
+    private const int InitialCapacity = 4;
 
-    // Конструкторы
     public SimpleList()
     {
-        _items = _emptyArray;
+        elements = new T[InitialCapacity];
+        size = 0;
     }
 
     public SimpleList(int capacity)
     {
-        if (capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
-        _items = capacity == 0 ? _emptyArray : new T[capacity];
+        if (capacity < 0)
+            throw new Exception("емкость не может быть отрицательной");
+        elements = new T[capacity];
+        size = 0;
     }
 
-    public SimpleList(IEnumerable<T> collection)
-    {
-        if (collection == null) throw new ArgumentNullException(nameof(collection));
-
-        if (collection is ICollection<T> c)
-        {
-            int count = c.Count;
-            if (count == 0)
-            {
-                _items = _emptyArray;
-            }
-            else
-            {
-                _items = new T[count];
-                c.CopyTo(_items, 0);
-                _size = count;
-            }
-        }
-        else
-        {
-            _size = 0;
-            _items = new T[4];
-            foreach (var item in collection)
-                Add(item);
-        }
-    }
-
-    // ICollection<T> и ICollection
-    public int Count => _size;
-
-    public bool IsReadOnly => false;
-
-    public bool IsSynchronized => false;
-
-    public object SyncRoot => this;
-
-    public void Add(T item)
-    {
-        if (_size == _items.Length) EnsureCapacity(_size + 1);
-        _items[_size++] = item;
-        _version++;
-    }
-
-    public void Clear()
-    {
-        if (_size > 0)
-        {
-            Array.Clear(_items, 0, _size);
-            _size = 0;
-        }
-        _version++;
-    }
-
-    public bool Contains(T item)
-    {
-        return IndexOf(item) >= 0;
-    }
-
-    public void CopyTo(T[] array, int arrayIndex)
-    {
-        Array.Copy(_items, 0, array, arrayIndex, _size);
-    }
-
-    public void CopyTo(Array array, int index)
-    {
-        if (array == null) throw new ArgumentNullException(nameof(array));
-        if (array.Rank != 1) throw new ArgumentException("Multi-dimensional arrays are not supported");
-        Array.Copy(_items, 0, array, index, _size);
-    }
-
-    public bool Remove(T item)
-    {
-        int index = IndexOf(item);
-        if (index >= 0)
-        {
-            RemoveAt(index);
-            return true;
-        }
-        return false;
-    }
-
-    // IList<T> и IList
     public T this[int index]
     {
         get
         {
-            if (index < 0 || index >= _size) throw new ArgumentOutOfRangeException(nameof(index));
-            return _items[index];
+            if (index < 0 || index >= size)
+                throw new Exception("индекс вне диапазона");
+            return elements[index];
         }
         set
         {
-            if (index < 0 || index >= _size) throw new ArgumentOutOfRangeException(nameof(index));
-            _items[index] = value;
-            _version++;
+            if (index < 0 || index >= size)
+                throw new Exception("индекс вне диапазона");
+            elements[index] = value;
         }
     }
 
-    object IList.this[int index]
+    public int Count => size;
+
+    public bool IsReadOnly => false;
+
+    public void Add(T item)
     {
-        get => this[index];
-        set
+        if (size >= elements.Length)
         {
-            try
-            {
-                this[index] = (T)value;
-            }
-            catch (InvalidCastException)
-            {
-                throw new ArgumentException($"Value must be of type {typeof(T)}");
-            }
+            ExpandCapacity();
         }
+        elements[size] = item;
+        size++;
     }
 
-    public int IndexOf(T item)
+    public void Clear()
     {
-        return Array.IndexOf(_items, item, 0, _size);
+        Array.Clear(elements, 0, size);
+        size = 0;
     }
 
-    public void Insert(int index, T item)
+    public bool Contains(T item)
     {
-        if (index < 0 || index > _size) throw new ArgumentOutOfRangeException(nameof(index));
-
-        if (_size == _items.Length) EnsureCapacity(_size + 1);
-
-        if (index < _size)
-            Array.Copy(_items, index, _items, index + 1, _size - index);
-
-        _items[index] = item;
-        _size++;
-        _version++;
+        return FindIndex(item) >= 0;
     }
 
-    public void RemoveAt(int index)
+    public void CopyTo(T[] array, int arrayIndex)
     {
-        if (index < 0 || index >= _size) throw new ArgumentOutOfRangeException(nameof(index));
+        if (array == null)
+            throw new Exception("массив не может быть null");
+        if (arrayIndex < 0)
+            throw new Exception("индекс не может быть отрицательным");
+        if (array.Length - arrayIndex < size)
+            throw new Exception("недостаточно места в массиве");
 
-        _size--;
-        if (index < _size)
-            Array.Copy(_items, index + 1, _items, index, _size - index);
-
-        _items[_size] = default;
-        _version++;
+        Array.Copy(elements, 0, array, arrayIndex, size);
     }
 
-    // IEnumerable<T> и IEnumerable
     public IEnumerator<T> GetEnumerator()
     {
-        return new Enumerator(this);
+        for (int idx = 0; idx < size; idx++)
+        {
+            yield return elements[idx];
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -176,135 +88,70 @@ public class SimpleList<T> : IList<T>, IList, IEnumerable<T>, IEnumerable, IColl
         return GetEnumerator();
     }
 
-    // IList (явная реализация)
-    bool IList.IsFixedSize => false;
-
-    int IList.Add(object value)
+    public int IndexOf(T item)
     {
-        try
-        {
-            Add((T)value);
-        }
-        catch (InvalidCastException)
-        {
-            throw new ArgumentException($"Value must be of type {typeof(T)}");
-        }
-        return _size - 1;
+        return FindIndex(item);
     }
 
-    bool IList.Contains(object value)
+    public void Insert(int index, T item)
     {
-        if (value is T || value == null)
-            return Contains((T)value);
+        if (index < 0 || index > size)
+            throw new Exception("индекс вне диапазона");
+
+        if (size >= elements.Length)
+        {
+            ExpandCapacity();
+        }
+
+        if (index < size)
+        {
+            Array.Copy(elements, index, elements, index + 1, size - index);
+        }
+
+        elements[index] = item;
+        size++;
+    }
+
+    public bool Remove(T item)
+    {
+        int position = FindIndex(item);
+        if (position >= 0)
+        {
+            RemoveAt(position);
+            return true;
+        }
         return false;
     }
 
-    int IList.IndexOf(object value)
+    public void RemoveAt(int index)
     {
-        if (value is T || value == null)
-            return IndexOf((T)value);
+        if (index < 0 || index >= size)
+            throw new Exception("индекс вне диапазона");
+
+        size--;
+        if (index < size)
+        {
+            Array.Copy(elements, index + 1, elements, index, size - index);
+        }
+        elements[size] = default(T)!;
+    }
+
+    private int FindIndex(T item)
+    {
+        for (int idx = 0; idx < size; idx++)
+        {
+            if (EqualityComparer<T>.Default.Equals(elements[idx], item))
+                return idx;
+        }
         return -1;
     }
 
-    void IList.Insert(int index, object value)
+    private void ExpandCapacity()
     {
-        try
-        {
-            Insert(index, (T)value);
-        }
-        catch (InvalidCastException)
-        {
-            throw new ArgumentException($"Value must be of type {typeof(T)}");
-        }
-    }
-
-    void IList.Remove(object value)
-    {
-        if (value is T || value == null)
-            Remove((T)value);
-    }
-
-    // Вспомогательные методы
-    private void EnsureCapacity(int min)
-    {
-        if (_items.Length < min)
-        {
-            int newCapacity = _items.Length == 0 ? 4 : _items.Length * 2;
-            if (newCapacity < min) newCapacity = min;
-
-            T[] newItems = new T[newCapacity];
-            Array.Copy(_items, 0, newItems, 0, _size);
-            _items = newItems;
-        }
-    }
-
-    public void TrimExcess()
-    {
-        int threshold = (int)(_items.Length * 0.9);
-        if (_size < threshold)
-        {
-            T[] newItems = new T[_size];
-            Array.Copy(_items, 0, newItems, 0, _size);
-            _items = newItems;
-        }
-    }
-
-    // Вложенный класс Enumerator
-    private class Enumerator : IEnumerator<T>, IEnumerator
-    {
-        private SimpleList<T> _list;
-        private int _index;
-        private int _version;
-        private T _current;
-
-        public Enumerator(SimpleList<T> list)
-        {
-            _list = list;
-            _index = 0;
-            _version = list._version;
-            _current = default;
-        }
-
-        public T Current => _current;
-
-        object IEnumerator.Current
-        {
-            get
-            {
-                if (_index == 0 || _index == _list._size + 1)
-                    throw new InvalidOperationException();
-                return _current;
-            }
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public bool MoveNext()
-        {
-            if (_version != _list._version)
-                throw new InvalidOperationException("Collection was modified");
-
-            if (_index < _list._size)
-            {
-                _current = _list._items[_index];
-                _index++;
-                return true;
-            }
-
-            _index = _list._size + 1;
-            _current = default;
-            return false;
-        }
-
-        public void Reset()
-        {
-            if (_version != _list._version)
-                throw new InvalidOperationException("Collection was modified");
-
-            _index = 0;
-            _current = default;
-        }
+        int newSize = elements.Length == 0 ? InitialCapacity : elements.Length * 2;
+        T[] expanded = new T[newSize];
+        Array.Copy(elements, expanded, size);
+        elements = expanded;
     }
 }
+
