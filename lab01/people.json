@@ -1,0 +1,38 @@
+﻿[
+  {
+    "firstName": "Дьяченко",
+    "lastName": "Егор",
+    "age": 17,
+    "personId": "1",
+    "birthDate": "2008-01-09T00:00:00",
+    "email": "tvoy.sosed2008@gmail.com",
+    "phone": "+7(918) 555-35-35",
+    "fullName": "ДьяченкоЕгор",
+    "isAdult": false,
+    "_birthDate": "2008-01-09T00:00:00"
+  },
+  {
+    "firstName": "Илья",
+    "lastName": "Скляр",
+    "age": 19,
+    "personId": "",
+    "birthDate": "0001-01-01T00:00:00",
+    "email": "skII@gmail.com",
+    "phone": "",
+    "fullName": "ИльяСкляр",
+    "isAdult": true,
+    "_birthDate": "0001-01-01T00:00:00"
+  },
+  {
+    "firstName": "Артем",
+    "lastName": "Свистунов",
+    "age": 19,
+    "personId": "",
+    "birthDate": "0001-01-01T00:00:00",
+    "email": "artem2006alex@gmail.com",
+    "phone": "",
+    "fullName": "АртемСвистунов",
+    "isAdult": true,
+    "_birthDate": "0001-01-01T00:00:00"
+  }
+]

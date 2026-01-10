@@ -1,0 +1,20 @@
+FROM liquibase/liquibase:latest
+
+USER root
+
+# Download PostgreSQL JDBC driver during build (when network is available)
+RUN mkdir -p /liquibase/lib && \
+    if command -v curl >/dev/null 2>&1; then \
+      curl -L -o /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.1/postgresql-42.7.1.jar; \
+    elif command -v wget >/dev/null 2>&1; then \
+      wget -q -O /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.1/postgresql-42.7.1.jar; \
+    else \
+      echo "Installing curl..." && \
+      (apk add --no-cache curl && curl -L -o /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.1/postgresql-42.7.1.jar) || \
+      (apt-get update && apt-get install -y --no-install-recommends curl && curl -L -o /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.1/postgresql-42.7.1.jar && rm -rf /var/lib/apt/lists/*) || \
+      (yum install -y curl && curl -L -o /liquibase/lib/postgresql.jar https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.1/postgresql-42.7.1.jar && rm -rf /var/cache/yum) || \
+      (echo "Failed to download driver" && exit 1); \
+    fi && \
+    ls -lh /liquibase/lib/postgresql.jar
+
+USER liquibase
